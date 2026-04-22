@@ -23,8 +23,6 @@ jobs:
             asset_os: linux
             asset_arch: x86_64
             binary_name: rotranslator
-          # GitHub does not provide a generic Intel "latest" macOS label.
-          # Use the current latest supported Intel runner explicitly.
           - os: macos-15-intel
             asset_os: macos
             asset_arch: x86_64
