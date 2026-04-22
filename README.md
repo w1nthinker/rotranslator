@@ -41,12 +41,12 @@ Download the binary for your system from the latest release.
 
 Current release asset names:
 
-- `rotranslator-linux-x86_64`
-- `rotranslator-macos-x86_64`
-- `rotranslator-macos-aarch64`
-- `rotranslator-windows-x86_64.exe`
+- `rotranslator-0.1.0-linux-x86_64.zip`
+- `rotranslator-0.1.0-macos-x86_64.zip`
+- `rotranslator-0.1.0-macos-aarch64.zip`
+- `rotranslator-0.1.0-windows-x86_64.zip`
 
-Run it directly:
+Extract the archive, then run the binary inside:
 
 ```bash
 ./rotranslator
@@ -137,7 +137,7 @@ GitHub Actions builds single-file binaries for:
 - macOS arm64
 - Windows x86_64
 
-Pushing a tag like `v0.1.0` triggers the release workflow and uploads those binaries to the release page.
+Pushing a tag like `v0.1.0` triggers the release workflow and uploads versioned `.zip` archives to the release page.
 
 ## Development
 

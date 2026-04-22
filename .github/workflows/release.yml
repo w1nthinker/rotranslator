@@ -20,21 +20,27 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            asset_name: rotranslator-linux-x86_64
-            binary_path: dist/rotranslator
+            asset_os: linux
+            asset_arch: x86_64
+            binary_name: rotranslator
           # GitHub does not provide a generic Intel "latest" macOS label.
           # Use the current latest supported Intel runner explicitly.
           - os: macos-15-intel
-            asset_name: rotranslator-macos-x86_64
-            binary_path: dist/rotranslator
+            asset_os: macos
+            asset_arch: x86_64
+            binary_name: rotranslator
           - os: macos-latest
-            asset_name: rotranslator-macos-aarch64
-            binary_path: dist/rotranslator
+            asset_os: macos
+            asset_arch: aarch64
+            binary_name: rotranslator
           - os: windows-latest
-            asset_name: rotranslator-windows-x86_64.exe
-            binary_path: dist/rotranslator.exe
+            asset_os: windows
+            asset_arch: x86_64
+            binary_name: rotranslator.exe
 
     runs-on: ${{ matrix.os }}
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
 
     steps:
       - uses: actions/checkout@v6
@@ -49,19 +55,37 @@ jobs:
       - name: Build binary
         run: python scripts/build_binary.py
 
-      - name: Rename asset
+      - name: Package release asset
         shell: python
         run: |
+          import stat
+          import zipfile
           from pathlib import Path
-          source = Path(r"${{ matrix.binary_path }}")
-          target = Path("dist") / r"${{ matrix.asset_name }}"
-          source.replace(target)
+
+          dist = Path("dist")
+          binary_name = Path(r"${{ matrix.binary_name }}")
+          binary_path = dist / binary_name
+          release_tag = "${{ env.RELEASE_TAG }}"
+          version = release_tag[1:] if release_tag.startswith("v") else release_tag
+          archive_name = f"rotranslator-{version}-${{ matrix.asset_os }}-${{ matrix.asset_arch }}.zip"
+          archive_path = dist / archive_name
+
+          archive_mode = "w"
+          with zipfile.ZipFile(archive_path, archive_mode, compression=zipfile.ZIP_DEFLATED) as archive:
+              info = zipfile.ZipInfo(binary_name.name)
+              info.compress_type = zipfile.ZIP_DEFLATED
+              if binary_name.suffix == ".exe":
+                  info.external_attr = (0o644 & 0xFFFF) << 16
+              else:
+                  # Preserve executable permissions when Rokit extracts the archive.
+                  info.external_attr = ((stat.S_IFREG | 0o755) & 0xFFFF) << 16
+              archive.writestr(info, binary_path.read_bytes())
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.asset_name }}
-          path: dist/${{ matrix.asset_name }}
+          name: rotranslator-${{ env.RELEASE_TAG }}-${{ matrix.asset_os }}-${{ matrix.asset_arch }}.zip
+          path: dist/rotranslator-*.zip
           overwrite: true
 
   release:
