@@ -16,6 +16,7 @@ from .config import TOTAL_ROBLOX_LOCALES
 from .progress import create_progress
 from .translator import BatchTranslator
 from .translator import BatchResult
+from .translator import estimate_progress_total
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -160,14 +161,12 @@ async def run_translations(
     description: str,
 ) -> list[BatchResult]:
     progress = create_progress()
-    total = TOTAL_ROBLOX_LOCALES * len(texts)
+    total = estimate_progress_total(texts)
 
     with progress:
         task_id = progress.add_task(description, total=total)
         on_progress = make_progress_callback(progress, task_id)
-        return await asyncio.gather(
-            *(translate_one(translator, text, compact, on_progress) for text in texts)
-        )
+        return await translator.translate_texts(texts, compact, on_progress)
 
 
 def render_results(console: Console, results: Sequence[BatchResult], show_meta: bool) -> None:
