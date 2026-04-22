@@ -6,6 +6,10 @@ A CLI translator to all supported roblox experience languages/locale.
 - copies the final JSON to your clipboard by default (disabled in batch mode)
 - stays open like an AI chat for easy and rappid translation
 
+## Why this?
+- Roblox OpenCloud generative_ai translate_text endpoint doesnt support every experience language, [see here](https://x.com/w1nthinker/status/2042958979983134969?s=20)
+- DeepL doesnt support thai as an translation target
+
 ## Examples
 https://github.com/user-attachments/assets/8698ac95-4fcb-4c8d-a357-a7287381da7d
 
