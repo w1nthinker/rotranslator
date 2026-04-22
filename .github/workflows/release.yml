@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: rotranslator-linux-x86_64
+            binary_path: dist/rotranslator
+          - os: macos-13
+            asset_name: rotranslator-macos-x86_64
+            binary_path: dist/rotranslator
+          - os: macos-14
+            asset_name: rotranslator-macos-aarch64
+            binary_path: dist/rotranslator
+          - os: windows-latest
+            asset_name: rotranslator-windows-x86_64.exe
+            binary_path: dist/rotranslator.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: python -m pip install --upgrade pip pyinstaller .
+
+      - name: Build binary
+        run: python scripts/build_binary.py
+
+      - name: Rename asset
+        shell: python
+        run: |
+          from pathlib import Path
+          source = Path(r"${{ matrix.binary_path }}")
+          target = Path("dist") / r"${{ matrix.asset_name }}"
+          source.replace(target)
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: dist/${{ matrix.asset_name }}
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
