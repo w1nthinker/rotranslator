@@ -18,10 +18,12 @@ jobs:
           - os: ubuntu-latest
             asset_name: rotranslator-linux-x86_64
             binary_path: dist/rotranslator
-          - os: macos-13
+          # GitHub does not provide a generic Intel "latest" macOS label.
+          # Use the current latest supported Intel runner explicitly.
+          - os: macos-15-intel
             asset_name: rotranslator-macos-x86_64
             binary_path: dist/rotranslator
-          - os: macos-14
+          - os: macos-latest
             asset_name: rotranslator-macos-aarch64
             binary_path: dist/rotranslator
           - os: windows-latest
