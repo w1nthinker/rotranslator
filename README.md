@@ -1,97 +1,20 @@
 # rotranslator
-
-`rotranslator` is a small terminal app that takes one line of text and translates it into all Roblox locales.
-
-You type something like `Hello world`, and it prints a Roblox-ready JSON object you can paste into your project.
-
-It is made for people who want a fast way to generate Roblox translation JSON from the terminal without setting up a full app or translation pipeline.
+A CLI translator to all supported roblox experience languages/locale.
 
 ## What It Does
+- translates to all 21 Roblox locale
+- copies the final JSON to your clipboard by default (disabled in batch mode)
+- stays open like an AI chat for easy and rappid translation
 
-- translates to all 21 Roblox locale keys
-- only sends 17 unique translation requests internally for better speed
-- copies the final JSON to your clipboard by default
-- stays open like a REPL so you can translate multiple lines quickly
-- can also queue multiple inputs in batch mode
+## Examples
+https://github.com/user-attachments/assets/8698ac95-4fcb-4c8d-a357-a7287381da7d
 
-## Install
+with `--batch` flag
 
-### Install with Rokit
-
-If you use Rokit, add `rotranslator` from this repository's GitHub Releases.
-
-Example `rokit.toml` shape:
-
-```toml
-[tools]
-rotranslator = { github = "w1nthinker/rotranslator", version = "0.1.0" }
-```
-
-Then install it with:
-
-```bash
-rokit install
-```
-
-Note: this depends on the GitHub repo and release existing first. If your Rokit version expects slightly different manifest syntax, keep the same GitHub owner/repo and version values and adjust to your installed Rokit format.
-
-### Install from a GitHub Release
-
-Download the binary for your system from the latest release.
-
-Current release asset names:
-
-- `rotranslator-0.1.0-linux-x86_64.zip`
-- `rotranslator-0.1.0-macos-x86_64.zip`
-- `rotranslator-0.1.0-macos-aarch64.zip`
-- `rotranslator-0.1.0-windows-x86_64.zip`
-
-Extract the archive, then run the binary inside:
-
-```bash
-./rotranslator
-```
-
-### Build from source
-
-Install dependencies:
-
-```bash
-uv sync
-```
-
-Run from source:
-
-```bash
-uv run rotranslator
-```
-
-Build a local binary:
-
-```bash
-uv run --extra build python scripts/build_binary.py
-```
-
-## Basic Example
-
-```text
-$ rotranslator
-Ready. Type text and press Enter. Ctrl+C to quit.
-
-> Hello world
-{
-  "ar-001": "...",
-  "de-de": "...",
-  "en-gb": "Hello world",
-  "en-us": "Hello world",
-  "...": "..."
-}
-
->
-```
+https://github.com/user-attachments/assets/a7a5cad9-b2a8-4170-ac77-6b009aed85c6
 
 ## Flags
-
+- `--help` shows you the info of this flags list
 - `--meta`
   Show detected input language, total time, and translated percent after the JSON.
 - `--no-copy`
@@ -104,17 +27,15 @@ Ready. Type text and press Enter. Ctrl+C to quit.
   Set how many translation requests run at once.
 
 ## Batch Mode
-
 Batch mode is useful when you want to queue a few strings and translate them together.
 
+*Up to 15K characters per API call, batch takes use of this to partition requests.*
 Start batch mode:
-
 ```bash
 uv run rotranslator --batch
 ```
 
 Flow:
-
 - enter one line
 - choose whether to add another
 - when you stop, all queued inputs are translated in parallel
@@ -128,21 +49,49 @@ Flow:
 - if one locale fails, its value becomes `null`
 - the app keeps running until you exit with `Ctrl+C` or `Ctrl+D`
 
-## Releases
+## Install
 
-GitHub Actions builds single-file binaries for:
+### Install with Rokit
+To install it globally: `rokit add --global w1nthinker/rotranslator` (**recommended**)
 
-- Linux x86_64
-- macOS x86_64
-- macOS arm64
-- Windows x86_64
+For project realm: `rokit add w1nthinker/rotranslator`
 
-Pushing a tag like `v0.1.0` triggers the release workflow and uploads versioned `.zip` archives to the release page.
+Or manually in `rokit.toml`
+```toml
+[tools]
+rotranslator = { github = "w1nthinker/rotranslator", version = "0.1.0" }
+```
+Following this after adding it manually:
+```bash
+rokit install
+```
 
-## Development
+### Install from a GitHub Release
+Download the binary for your system from the latest release.
+<img width="675" height="297" alt="Bildschirmfoto 2026-04-22 um 21 53 02" src="https://github.com/user-attachments/assets/b1c2302a-3550-404b-bb58-780ba5a01414" />
 
-Run tests:
+Run the binary in your terminal:
+```bash
+./rotranslator
+```
 
+### Build from source
+Install dependencies:
+```bash
+uv sync
+```
+
+Run from source:
+```bash
+uv run rotranslator
+```
+
+Build a local binary:
+```bash
+uv run --extra build python scripts/build_binary.py
+```
+
+Run tests: *(only when deving)*
 ```bash
 uv run --extra test pytest
 ```
