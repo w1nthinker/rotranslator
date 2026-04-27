@@ -1,5 +1,6 @@
 # rotranslator
 A CLI translator to all supported roblox experience languages/locale.
+Adding deepl and roblox support would have required me to add duplicate logic from [rosuite](https://github.com/w1nthinker/rosuite), so use the translate method of that
 
 ## What It Does
 - translates to all 21 Roblox locale
